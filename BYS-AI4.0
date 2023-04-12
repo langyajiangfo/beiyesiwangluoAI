@@ -1,0 +1,52 @@
+以下是更复杂的示例实现，其中我们使用了一个更大的数据集，并考虑了更多的变量，以便更准确地预测Steam游戏的推荐性。
+```python
+# 导入需要的库
+from pgmpy.models import BayesianModel
+from pgmpy.inference import VariableElimination
+from pgmpy.estimators import MaximumLikelihoodEstimator, BayesianEstimator
+import pandas as pd
+
+# 读取数据集
+data = pd.read_csv('steam_data.csv')
+
+# 构建贝叶斯网络模型
+model = BayesianModel([('game', 'review_sentiment'), ('game', 'time_played'),
+                       ('review_sentiment', 'recommendation'), ('time_played', 'recommendation'),
+                       ('price', 'recommendation'), ('genre', 'recommendation'),
+                       ('developer', 'recommendation'), ('publisher', 'recommendation'),
+                       ('positive_reviews', 'recommendation'), ('negative_reviews', 'recommendation')])
+
+# 使用最大似然估计器(Maximum Likelihood Estimator)学习参数
+model.fit(data, estimator=MaximumLikelihoodEstimator)
+
+# 定义变量消除推断器(Variable Elimination Inference)
+inference = VariableElimination(model)
+
+# 定义机器人的函数
+def steam_bot(game, review_sentiment, time_played, price, genre, developer, publisher, positive_reviews, negative_reviews):
+    # 定义查询变量(recommendation)
+    query = ['recommendation']
+
+    # 定义证据(evidence)
+    evidence = {
+        'game': game,
+        'review_sentiment': review_sentiment,
+        'time_played': time_played,
+        'price': price,
+        'genre': genre,
+        'developer': developer,
+        'publisher': publisher,
+        'positive_reviews': positive_reviews,
+        'negative_reviews': negative_reviews
+    }
+
+    # 进行概率推断
+    result = inference.query(variables=query, evidence=evidence)
+
+    # 返回结果
+    return result['recommendation'].values[1]
+
+
+# 测试机器人
+print(steam_bot('Sekiro: Shadows Die Twice', 'very_positive', '>100 hours', 59.99, 'Action', 'FromSoftware, Inc.', 'Activision', '90%', '10%'))
+```
