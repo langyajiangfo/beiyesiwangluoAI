@@ -1,0 +1,50 @@
+```python
+# 导入需要的库
+from pgmpy.models import BayesianModel
+from pgmpy.factors.discrete import TabularCPD
+
+# 定义变量名称
+variables = ['game_name', 'game_price', 'game_type', 'game_tag', 'game_description',
+            'game_developer', 'game_publisher', 'game_language_support', 'game_os_support',
+            'game_players', 'game_reviews_count', 'reviews_opinion', 'player_comments',
+            'purchase_decision', 'user_age', 'user_gender', 'user_location', 'user_language_ability',
+            'user_preference', 'user_reviews_count', 'user_avg_playtime', 'user_playtime_sd',
+            'user_fav_game_type', 'user_fav_game_publisher', 'user_fav_game_tag',
+            'user_fav_game_developer', 'user_fav_game_language_support', 'user_fav_game_os_support',
+            'user_fav_game_price_range', 'user_games_played', 'user_pos_review_ratio',
+            'user_neg_review_ratio', 'last_login_time', 'active_last_week', 'active_last_month',
+            'active_last_quarter', 'previous_purchases', 'prev_purchase_avg_price',
+            'prev_purchase_avg_players', 'prev_purchase_avg_reviews', 'prev_purchase_pos_review_ratio',
+            'prev_purchase_neg_review_ratio', 'prev_purchase_fav_type', 'prev_purchase_fav_tag',
+            'prev_purchase_fav_developer', 'prev_purchase_fav_publisher', 'prev_purchase_fav_lang_support',
+            'prev_purchase_fav_os_support', 'prev_purchase_count', 'prev_purchase_avg_rating',
+            'prev_purchase_avg_players_count', 'prev_purchase_avg_reviews_count',
+            'prev_purchase_pos_review_ratio', 'prev_purchase_neg_review_ratio']
+
+# 创建空的贝叶斯网络模型
+model = BayesianModel()
+
+# 添加变量节点
+for variable in variables:
+    model.add_node(variable)
+
+# 添加随机因子(CPDs)
+game_price_cpd = TabularCPD('game_price', 3, [[0.4, 0.3, 0.3]])
+game_type_cpd = TabularCPD('game_type', 5, [[0.2, 0.2, 0.2, 0.2, 0.2]])
+game_tag_cpd = TabularCPD('game_tag', 7, [[0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.1]])
+game_players_cpd = TabularCPD('game_players', 3, [[0.4, 0.3, 0.3]])
+user_age_cpd = TabularCPD('user_age', 3, [[0.4, 0.3, 0.3]])
+user_gender_cpd = TabularCPD('user_gender', 2, [[0.6, 0.4]])
+user_location_cpd = TabularCPD('user_location', 5, [[0.2, 0.2, 0.2, 0.2, 0.2]])
+user_language_ability_cpd = TabularCPD('user_language_ability', 3, [[0.4, 0.3, 0.3]])
+user_preference_cpd = TabularCPD('user_preference', 5, [[0.2, 0.2, 0.2, 0.2, 0.2]])
+user_fav_game_type_cpd = TabularCPD('user_fav_game_type', 5, [[0.2, 0.2, 0.2, 0.2, 0.2]])
+user_games_played_cpd = TabularCPD('user_games_played', 3, [[0.4, 0.3, 0.3]])
+
+model.add_cpds(game_price_cpd, game_type_cpd, game_tag_cpd, game_players_cpd, user_age_cpd,
+                user_gender_cpd, user_location_cpd, user_language_ability_cpd, user_preference_cpd,
+                user_fav_game_type_cpd, user_games_played_cpd)
+
+# 打印模型信息
+print(model.get_cpds())
+```
