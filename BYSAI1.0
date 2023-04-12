@@ -1,0 +1,24 @@
+下面是一个简单的贝叶斯网络模型的Python代码实现。在这个例子中，我们使用`pgmpy`(Python库)来构建和训练模型。
+
+```python
+# 导入需要的库
+from pgmpy.models import BayesianModel
+from pgmpy.estimators import MaximumLikelihoodEstimator, BayesianEstimator
+import pandas as pd
+
+# 创建数据集
+data = pd.read_csv('data.csv')
+
+# 定义模型的结构
+model = BayesianModel([('X', 'Y'), ('Z', 'Y'), ('W', 'Z')])
+
+# 使用最大似然估计器(Maximum Likelihood Estimator)来学习参数
+model.fit(data, estimator=MaximumLikelihoodEstimator)
+
+# 使用贝叶斯估计器(Bayesian Estimator)来进行概率推断
+infer = BayesianModelSampling(model)
+samples = infer.forward_sample(size=10000)
+
+# 打印输出结果
+print(samples.mean())
+```
