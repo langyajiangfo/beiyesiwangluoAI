@@ -1,0 +1,81 @@
+以下是更复杂的示例实现，其中我们使用了一个更大的数据集，并考虑了更多的变量，包括游戏标签、操作系统支持、语言支持、玩家数量、玩家评测数等，以便更准确地预测Steam游戏的推荐性。
+
+```python
+# 导入需要的库
+from pgmpy.models import BayesianModel
+from pgmpy.inference import VariableElimination
+from pgmpy.estimators import MaximumLikelihoodEstimator, BayesianEstimator
+import pandas as pd
+
+# 读取数据集
+data = pd.read_csv('steam_data.csv')
+
+# 构建贝叶斯网络模型
+model = BayesianModel([('game', 'review_sentiment'), ('game', 'time_played'),
+                       ('review_sentiment', 'recommendation'), ('time_played', 'recommendation'),
+                       ('price', 'recommendation'), ('genre', 'recommendation'),
+                       ('developer', 'recommendation'), ('publisher', 'recommendation'),
+                       ('positive_reviews', 'recommendation'), ('negative_reviews', 'recommendation'),
+                       ('action_tag', 'recommendation'), ('indie_tag', 'recommendation'),
+                       ('adventure_tag', 'recommendation'), ('multiplayer_tag', 'recommendation'),
+                       ('windows_support', 'recommendation'), ('mac_support', 'recommendation'),
+                       ('linux_support', 'recommendation'), ('english_support', 'recommendation'),
+                       ('spanish_support', 'recommendation'), ('chinese_support', 'recommendation'),
+                       ('russian_support', 'recommendation'), ('japanese_support', 'recommendation'),
+                       ('german_support', 'recommendation'), ('player_count', 'recommendation'),
+                       ('player_reviews_count', 'recommendation')])
+
+# 使用贝叶斯估计器(Bayesian Estimator)学习参数
+model.fit(data, estimator=BayesianEstimator, prior_type='BDeu', equivalent_sample_size=100)
+
+# 定义变量消除推断器(Variable Elimination Inference)
+inference = VariableElimination(model)
+
+# 定义机器人的函数
+def steam_bot(game, review_sentiment, time_played, price, genre, developer, publisher,
+              positive_reviews, negative_reviews, action_tag, indie_tag, adventure_tag, multiplayer_tag,
+              windows_support, mac_support, linux_support, english_support, spanish_support, chinese_support,
+              russian_support, japanese_support, german_support, player_count, player_reviews_count):
+    # 定义查询变量(recommendation)
+    query = ['recommendation']
+
+    # 定义证据(evidence)
+    evidence = {
+        'game': game,
+        'review_sentiment': review_sentiment,
+        'time_played': time_played,
+        'price': price,
+        'genre': genre,
+        'developer': developer,
+        'publisher': publisher,
+        'positive_reviews': positive_reviews,
+        'negative_reviews': negative_reviews,
+        'action_tag': action_tag,
+        'indie_tag': indie_tag,
+        'adventure_tag': adventure_tag,
+        'multiplayer_tag': multiplayer_tag,
+        'windows_support': windows_support,
+        'mac_support': mac_support,
+        'linux_support': linux_support,
+        'english_support': english_support,
+        'spanish_support': spanish_support,
+        'chinese_support': chinese_support,
+        'russian_support': russian_support,
+        'japanese_support': japanese_support,
+        'german_support': german_support,
+        'player_count': player_count,
+        'player_reviews_count': player_reviews_count
+    }
+
+    # 进行概率推断
+    result = inference.query(variables=query, evidence=evidence)
+
+    # 返回结果
+    return result['recommendation'].values[1]
+
+
+# 测试机器人
+print(steam_bot('Valheim', 'very_positive', '>100 hours', 19.99, 'Action Adventure Indie RPG', 'Iron Gate AB', 'Coffee Stain Publishing',
+                 '95%', '5%', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True',
+                 'False', 'True', '500000', '10000'))
+```
