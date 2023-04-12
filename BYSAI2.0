@@ -1,0 +1,43 @@
+下面是一个基于复杂贝叶斯网络的Steam机器人的Python代码实现。请注意，这只是一个示例，并且可能需要进一步优化和改进。
+
+```python
+# 导入需要的库
+from pgmpy.models import BayesianModel
+from pgmpy.inference import VariableElimination
+import pandas as pd
+
+# 创建数据集
+data = pd.read_csv('steam_data.csv')
+
+# 构建贝叶斯网络模型
+model = BayesianModel([('game', 'review_sentiment'), ('game', 'time_played'),
+                       ('review_sentiment', 'recommendation'), ('time_played', 'recommendation')])
+
+# 使用最大似然估计器(Maximum Likelihood Estimator)来学习参数
+model.fit(data, estimator=MaximumLikelihoodEstimator)
+
+# 定义变量消除推断器(Variable Elimination Inference)
+inference = VariableElimination(model)
+
+# 定义机器人的函数
+def steam_bot(game, review_sentiment, time_played):
+    # 定义查询变量(recommendation)
+    query = ['recommendation']
+
+    # 定义证据(evidence)
+    evidence = {
+        'game': game,
+        'review_sentiment': review_sentiment,
+        'time_played': time_played
+    }
+
+    # 进行概率推断
+    result = inference.query(variables=query, evidence=evidence)
+
+    # 返回结果
+    return result['recommendation'].values[1]
+
+
+# 测试机器人
+print(steam_bot('Resident Evil Village', 'positive', '10 hours'))
+```
